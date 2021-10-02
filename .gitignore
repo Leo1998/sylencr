@@ -1,5 +1,6 @@
+data
+
 *.swp
 venv
-
 __pycache__
 .vscode

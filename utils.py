@@ -44,7 +44,9 @@ def plot_spectrum(tensor, db=False):
 if __name__ == '__main__':
   sr = 11025
   D = to_stft(librosa.ex('trumpet'), 512, sr)
+  print(f"D.shape: {D.shape}")
   M = stft_to_mel(D, 512, sr, 128)
+  print(f"M.shape: {M.shape}")
 
   D_out = mel_to_stft(M, 512, sr, np.angle(D))
-  write_stft_to_wav("out.wav", D_out, sr)
+  #write_stft_to_wav("out.wav", D_out, sr)
