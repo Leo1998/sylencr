@@ -41,29 +41,28 @@ class Dataset(torch.utils.data.Dataset):
 
         D_noise = utils.to_stft(noise_file, self.n_fft, self.sr)
         #print(f"D_noise.shape: {D_noise.shape}")
-        M_noise = utils.stft_to_mel(D_noise, self.n_fft, self.sr, self.n_mels)
-        #print(f"M_noise.shape: {M_noise.shape}")
-
         D_speech = utils.to_stft(speech_file, self.n_fft, self.sr)
         #print(f"D_speech.shape: {D_speech.shape}")
+        
+        D_noise_orig = D_noise
+        while D_noise.shape[0] < D_speech.shape[0]:
+            D_noise = np.append(D_noise, D_noise, axis = 0)
+        D_noise = D_noise[:D_speech.shape[0],:]
+
+        mix = 0.5
+        D_mixed = mix * D_speech + (1/mix) * D_noise
+
+        M_noise = utils.stft_to_mel(D_noise, self.n_fft, self.sr, self.n_mels)
+        #print(f"M_noise.shape: {M_noise.shape}")
         M_speech = utils.stft_to_mel(D_speech, self.n_fft, self.sr, self.n_mels)
         #print(f"M_speech.shape: {M_speech.shape}")
 
-        M_noise_fitted = M_noise
-        while M_noise_fitted.shape[0] < M_speech.shape[0]:
-            M_noise_fitted = np.append(M_noise_fitted, M_noise, axis = 0)
-        M_noise_fitted = M_noise_fitted[:M_speech.shape[0],:]
-        #print(f"M_noise_fitted.shape: {M_noise_fitted.shape}")
+        M_mixed = utils.stft_to_mel(D_mixed, self.n_fft, self.sr, self.n_mels)
 
-        M_mixed = M_speech + M_noise_fitted
-
-        X = M_mixed
-        y = M_speech
-
-        return X, y
+        return D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise
 
 if __name__ == '__main__':
     dataset = Dataset('data/noise', 'data/speech')
     print(f"Length of Dataset: {len(dataset)}")
-    for X, y in dataset:
+    for D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise in dataset:
         pass
