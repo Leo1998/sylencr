@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import torch
-import utils
 import os
 import numpy as np
+
+import utils
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, noise_path, speech_path):
@@ -61,10 +62,6 @@ class Dataset(torch.utils.data.Dataset):
 
         return D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise
 
-if __name__ == '__main__':
-    dataset = Dataset('data/noise', 'data/speech')
-    print(f"Length of Dataset: {len(dataset)}")
 
-    for D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise in dataset:
-        utils.plot_spectrum(M_mixed)
-        utils.plot_spectrum(utils.log_norm(M_mixed))
+
+
