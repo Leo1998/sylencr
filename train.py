@@ -7,11 +7,15 @@ import utils
 import dataset
 
 if __name__ == '__main__':
-    dataset = dataset.Dataset('data/noise', 'data/speech')
-    print(f"Length of Dataset: {len(dataset)}")
+    trainDataset = dataset.TrainDataset('data/noise', 'data/speech')
+    print(f"Length of trainDataset: {len(trainDataset)}")
 
-    train_dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
+    windowedDataset = dataset.WindowedTrainDataset(trainDataset, 8)
 
-    '''for D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise in dataset:
-        utils.plot_spectrum(M_mixed)
-        utils.plot_spectrum(utils.log_norm(M_mixed))'''
+    train_dataloader = DataLoader(windowedDataset, num_workers=0, batch_size=64)
+
+    X, y = next(iter(train_dataloader))
+    print(f"X.shape: {X.shape}")
+    print(f"y.shape: {y.shape}")
+
+

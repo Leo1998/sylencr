@@ -2,10 +2,11 @@
 import torch
 import os
 import numpy as np
+from torch.utils.data import RandomSampler
 
 import utils
 
-class Dataset(torch.utils.data.Dataset):
+class TrainDataset(torch.utils.data.Dataset):
     def __init__(self, noise_path, speech_path):
         self.n_fft = 512
         self.n_mels = 128
@@ -63,5 +64,20 @@ class Dataset(torch.utils.data.Dataset):
         return D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise
 
 
+class WindowedTrainDataset(torch.utils.data.IterableDataset):
+    def __init__(self, trainDataset, n_time_windows):
+        self.trainDataset = trainDataset
+        self.n_time_windows = n_time_windows
 
+    def __iter__(self):
+        worker_info = torch.utils.data.get_worker_info()
+        if worker_info is not None:
+            raise ValueError('No multiprocessing supported yet!')
+
+        sampler = RandomSampler(self.trainDataset)
+        
+        for index in sampler:
+            D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise = self.trainDataset[index]
+            for i in range(self.n_time_windows, M_mixed.shape[0]):
+                yield M_mixed[i-self.n_time_windows:i], M_speech[i-1]
 
