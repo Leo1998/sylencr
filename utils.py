@@ -26,6 +26,16 @@ def mel_to_stft(M, n_fft, sr, phases):
   D = librosa.feature.inverse.mel_to_stft(M.T, n_fft=n_fft, sr=sr, power=1)
   return np.vectorize(cmath.rect)(D.T, phases)
 
+def log_norm(S):
+    return (librosa.amplitude_to_db(S, ref=np.max) + 80.0) / 80.0
+
+def ilog_norm(S):
+    return librosa.db_to_amplitude(S * 80.0 - 80.0, ref=1.0)
+
+def pcen(S):
+    pcen_S = librosa.pcen(S * (2**31), axis=0)
+    return pcen_S
+
 def write_stft_to_wav(file, D, sr):
   x = librosa.istft(D.T)
 
@@ -48,5 +58,8 @@ if __name__ == '__main__':
   M = stft_to_mel(D, 512, sr, 128)
   print(f"M.shape: {M.shape}")
 
+  M_norm = log_norm(M)
+  M = ilog_norm(M_norm)
+
   D_out = mel_to_stft(M, 512, sr, np.angle(D))
-  #write_stft_to_wav("out.wav", D_out, sr)
+  write_stft_to_wav("out.wav", D_out, sr)

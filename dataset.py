@@ -64,5 +64,7 @@ class Dataset(torch.utils.data.Dataset):
 if __name__ == '__main__':
     dataset = Dataset('data/noise', 'data/speech')
     print(f"Length of Dataset: {len(dataset)}")
+
     for D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise in dataset:
-        pass
+        utils.plot_spectrum(M_mixed)
+        utils.plot_spectrum(utils.log_norm(M_mixed))
