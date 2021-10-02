@@ -79,5 +79,10 @@ class WindowedTrainDataset(torch.utils.data.IterableDataset):
         for index in sampler:
             D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise = self.trainDataset[index]
             for i in range(self.n_time_windows, M_mixed.shape[0]):
-                yield M_mixed[i-self.n_time_windows:i], M_speech[i-1]
+                X = M_mixed[i-self.n_time_windows:i]
+                X_norm = utils.log_norm(X)
+                y = M_speech[i-1]
+                mask = utils.mask(X[-1], y)
+
+                yield X, X_norm, y, mask
 

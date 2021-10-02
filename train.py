@@ -35,12 +35,12 @@ class DnnModel(nn.Module):
 
 
 def train_loop(dataloader, device, model, loss_fn, optimizer):
-    for X, y in dataloader:
-        X, y = X.to(device), y.to(device)
+    for X, X_norm, y, mask in dataloader:
+        X, X_norm, y, mask = X.to(device), X_norm.to(device), y.to(device), mask.to(device)
 
         # Compute prediction and loss
-        pred = model(X)
-        loss = loss_fn(pred, y)
+        pred = model(X_norm)
+        loss = loss_fn(pred, mask)
 
         # Backpropagation
         optimizer.zero_grad()
@@ -91,4 +91,6 @@ if __name__ == '__main__':
         print(f"Epoch {t+1}\n-------------------------------")
         train_loop(train_dataloader, device, model, loss_fn, optimizer)
     print("Done!")
+
+    torch.save(model.state_dict(), 'model_weights.pth')
 
