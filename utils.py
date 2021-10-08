@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-import random
+
 import numpy as np
-import math
 import cmath
 import matplotlib.pyplot as plt
 import librosa
@@ -26,7 +25,7 @@ def mel_to_stft(M, n_fft, sr, phases):
   D = librosa.feature.inverse.mel_to_stft(M.T, n_fft=n_fft, sr=sr, power=1)
   return np.vectorize(cmath.rect)(D.T, phases)
 
-def mask(N, S):
+def magnitude_mask(N, S):
     return np.clip(np.nan_to_num(np.true_divide(S, N), nan=0.0, posinf=1.0, neginf=0.0), a_min=0.0, a_max=1.0)
 
 def log_norm(S):

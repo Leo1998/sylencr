@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-import torch
+
 import os
 import numpy as np
+import torch
 from torch.utils.data import RandomSampler
 
 import utils
@@ -82,7 +83,7 @@ class WindowedTrainDataset(torch.utils.data.IterableDataset):
                 X = M_mixed[i-self.n_time_windows:i]
                 X_norm = utils.log_norm(X)
                 y = M_speech[i-1]
-                mask = utils.mask(X[-1], y)
+                mask = utils.magnitude_mask(X[-1], y)
 
                 yield X, X_norm, y, mask
 
