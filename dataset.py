@@ -7,7 +7,7 @@ from torch.utils.data import RandomSampler
 
 import utils
 
-class TrainDataset(torch.utils.data.Dataset):
+class Dataset(torch.utils.data.Dataset):
     def __init__(self, noise_path, speech_path):
         self.n_fft = 512
         self.n_mels = 128
@@ -65,7 +65,7 @@ class TrainDataset(torch.utils.data.Dataset):
         return D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise
 
 
-class WindowedTrainDataset(torch.utils.data.IterableDataset):
+class WindowedDataset(torch.utils.data.IterableDataset):
     def __init__(self, trainDataset, n_time_windows):
         self.trainDataset = trainDataset
         self.n_time_windows = n_time_windows
@@ -84,6 +84,10 @@ class WindowedTrainDataset(torch.utils.data.IterableDataset):
                 X_norm = utils.log_norm(X)
                 y = M_speech[i-1]
                 mask = utils.magnitude_mask(X[-1], y)
+
+                X = np.expand_dims(X, axis=0)
+                X_norm = np.expand_dims(X_norm, axis=0)
+                y = np.expand_dims(y, axis=0)
 
                 yield X, X_norm, y, mask
 
