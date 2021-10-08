@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from torch import nn
 
 import dataset
+import losses
 import models
 
 def train_loop(dataloader, device, model, loss_fn, optimizer):
@@ -58,7 +59,7 @@ if __name__ == '__main__':
     model = models.DnnModel().to(device)
     print(model)
 
-    loss_fn = nn.MSELoss()
+    loss_fn = losses.CustomMaskMSE(alpha=6.0)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     for t in range(epochs):
