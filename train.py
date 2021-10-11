@@ -47,12 +47,12 @@ if __name__ == '__main__':
     windowedTrainDataset = dataset.WindowedDataset(trainDataset, 8)
     windowedTestDataset = dataset.WindowedDataset(testDataset, 8)
 
-    batch_size = 64
+    batch_size = 128
     learning_rate = 1e-3
     epochs = 1
 
-    train_dataloader = DataLoader(windowedTrainDataset, num_workers=0, batch_size=batch_size)
-    test_dataloader = DataLoader(windowedTestDataset, num_workers=0, batch_size=batch_size)
+    train_dataloader = DataLoader(windowedTrainDataset, num_workers=4, batch_size=batch_size)
+    test_dataloader = DataLoader(windowedTestDataset, num_workers=4, batch_size=batch_size)
 
     device = 'cpu'
     #device = 'cuda' if torch.cuda.is_available() else 'cpu'

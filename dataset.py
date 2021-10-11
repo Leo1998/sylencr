@@ -3,7 +3,7 @@
 import os
 import numpy as np
 import torch
-from torch.utils.data import RandomSampler
+from torch.utils.data import RandomSampler, SubsetRandomSampler
 
 import utils
 
@@ -72,10 +72,14 @@ class WindowedDataset(torch.utils.data.IterableDataset):
 
     def __iter__(self):
         worker_info = torch.utils.data.get_worker_info()
-        if worker_info is not None:
-            raise ValueError('No multiprocessing supported yet!')
+        if worker_info is None:
+            sampler = RandomSampler(self.trainDataset)
+        else:
+            startIdx = int(len(self.trainDataset) / worker_info.num_workers) * worker_info.id
+            endIdx = int(len(self.trainDataset) / worker_info.num_workers) * (worker_info.id + 1)
+            sampler = SubsetRandomSampler(range(0, len(self.trainDataset)))
 
-        sampler = RandomSampler(self.trainDataset)
+            print(f"Initialized worker {worker_info.id} partition: ({startIdx}, {endIdx})")
         
         for index in sampler:
             D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise = self.trainDataset[index]
