@@ -2,10 +2,80 @@
 
 import os
 import numpy as np
+import random
 import torch
 from torch.utils.data import RandomSampler, SubsetRandomSampler
 
 import utils
+
+
+
+class OriginalDataset(torch.utils.data.Dataset):
+    def __init__(self, noise_path, speech_path):
+        self.n_fft = 512
+        self.n_mels = 128
+        self.sr = 11025
+        self.noise_path = noise_path
+        self.speech_path = speech_path
+
+        self.noise_files = []
+        self.speech_files = []
+        for (path, dirs, files) in os.walk(noise_path):
+            for file in files:
+                file = os.path.join(path, file)
+                if not file.lower().endswith('.wav'):
+                    continue
+                #print(f"Adding noise file: {file}")
+                self.noise_files.append(file)
+        
+        for (path, dirs, files) in os.walk(self.speech_path):
+            for file in files:
+                file = os.path.join(path, file)
+                if not file.lower().endswith('.wav'):
+                    continue
+                #print(f"Adding speech file: {file}")
+                self.speech_files.append(file)
+
+    def __len__(self):
+        return len(self.speech_files)
+
+    def __getitem__(self, index):
+        noise_file = self.noise_files[index % len(self.noise_files)]
+        speech_file = self.speech_files[index]
+
+        #print(f"Generating mix of speech file: {speech_file} and noise file: {noise_file}")
+
+        D_noise = utils.to_stft(noise_file, self.n_fft, self.sr)
+        #print(f"D_noise.shape: {D_noise.shape}")
+        D_speech = utils.to_stft(speech_file, self.n_fft, self.sr)
+        #print(f"D_speech.shape: {D_speech.shape}")
+        
+        while D_noise.shape[0] < D_speech.shape[0]:
+            D_noise = np.append(D_noise, D_noise, axis = 0)
+        D_noise = D_noise[:D_speech.shape[0],:]
+
+        D_noise *= random.random() * 3.0 + 1.0
+        D_speech *= random.random() * 2.5 + 1.0
+
+        D_mixed = D_speech + D_noise
+
+        M_noise = utils.stft_to_mel(D_noise, self.n_fft, self.sr, self.n_mels)
+        #print(f"M_noise.shape: {M_noise.shape}")
+        M_speech = utils.stft_to_mel(D_speech, self.n_fft, self.sr, self.n_mels)
+        #print(f"M_speech.shape: {M_speech.shape}")
+
+        M_mixed = utils.stft_to_mel(D_mixed, self.n_fft, self.sr, self.n_mels)
+        #print(f"M_mixed.shape: {M_mixed.shape}")
+
+        #utils.plot_spectrum(M_noise, db=True)
+        #utils.plot_spectrum(M_speech, db=True)
+        #utils.plot_spectrum(M_mixed, db=True)
+
+        return D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise
+
+
+#########################################################################
+
 
 class FullDataset(torch.utils.data.Dataset):
     def __init__(self, noise_path, speech_path):
@@ -61,7 +131,14 @@ class FullDataset(torch.utils.data.Dataset):
 
         M_mixed = utils.stft_to_mel(D_mixed, self.n_fft, self.sr, self.n_mels)
 
+        #utils.plot_spectrum(M_noise, db=True)
+        #utils.plot_spectrum(M_speech, db=True)
+        #utils.plot_spectrum(M_mixed, db=True)
+
         return D_mixed, M_mixed, D_speech, M_speech, D_noise, M_noise
+
+
+#########################################################################
 
 
 class WindowedDataset(torch.utils.data.IterableDataset):

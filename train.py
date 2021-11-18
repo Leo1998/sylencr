@@ -39,9 +39,9 @@ def test_loop(dataloader, model, loss_fn):
     print(f"Test Error: Avg loss: {test_loss:>8f} \n")
 
 if __name__ == '__main__':
-    trainDataset = dataset.FullDataset('data/train/noise', 'data/train/speech')
+    trainDataset = dataset.OriginalDataset('data/train/noise/keyboard', 'data/train/speech')
     print(f"Length of trainDataset: {len(trainDataset)}")
-    testDataset = dataset.FullDataset('data/test/noise', 'data/test/speech')
+    testDataset = dataset.OriginalDataset('data/test/noise/keyboard', 'data/test/speech')
     print(f"Length of testDataset: {len(testDataset)}")
 
     windowedTrainDataset = dataset.WindowedDataset(trainDataset, 8)
