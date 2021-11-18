@@ -10,6 +10,7 @@ import losses
 import models
 
 def train_loop(dataloader, device, model, loss_fn, optimizer):
+    batch_counter = 0
     for X, X_norm, y, mask in dataloader:
         X, X_norm, y, mask = X.to(device), X_norm.to(device), y.to(device), mask.to(device)
 
@@ -23,7 +24,8 @@ def train_loop(dataloader, device, model, loss_fn, optimizer):
         optimizer.step()
 
         loss = loss.item()
-        print(f"loss: {loss:>7f}")
+        print(f"batch: {batch_counter}, loss: {loss:>7f}")
+        batch_counter += 1
 
 def test_loop(dataloader, model, loss_fn):
     test_loss = 0
@@ -48,7 +50,7 @@ if __name__ == '__main__':
     windowedTestDataset = dataset.WindowedDataset(testDataset, 8)
 
     batch_size = 128
-    learning_rate = 1e-3
+    learning_rate = 1e-3 # default value for Adam
     epochs = 1
 
     num_workers = 4
@@ -59,10 +61,10 @@ if __name__ == '__main__':
     #device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print('Using {} device'.format(device))
 
-    model = models.CnnModel().to(device)
+    model = models.DnnModel().to(device)
     print(model)
 
-    loss_fn = losses.CustomMaskMSE(alpha=6.0)
+    loss_fn = losses.CustomMaskMSE(alpha=8.0)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     for t in range(epochs):

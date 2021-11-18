@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+import math
 import cmath
 import matplotlib.pyplot as plt
 import librosa
@@ -28,11 +29,20 @@ def mel_to_stft(M, n_fft, sr, phases):
 def magnitude_mask(N, S):
     return np.clip(np.nan_to_num(np.true_divide(S, N), nan=0.0, posinf=1.0, neginf=0.0), a_min=0.0, a_max=1.0)
 
-def log_norm(S):
+def db_norm(S):
     return (librosa.amplitude_to_db(S, ref=np.max) + 80.0) / 80.0
 
-def ilog_norm(S):
+def idb_norm(S):
     return librosa.db_to_amplitude(S * 80.0 - 80.0, ref=1.0)
+
+c = math.pow(10, -7)
+def log_norm(S):
+  S = np.abs(S)
+  return np.clip((np.vectorize(lambda x: math.log(x + c))(S) + 15.0) / 20.0, 0.0, 1.0).astype('float32')
+
+def ilog_norm(S):
+  S = S * 20.0 - 15.0
+  return np.vectorize(lambda x: math.exp(x) - c)(S)
 
 def pcen(S):
     pcen_S = librosa.pcen(S * (2**31), axis=0)

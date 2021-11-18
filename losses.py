@@ -16,4 +16,4 @@ class CustomMaskMSE(nn.Module):
         upper = torch.relu(inputs - targets).square()
         lower = torch.relu(targets - inputs).square()
 
-        return torch.mean(upper * (1.0 - (1.0 / self.alpha)) + lower * (1 / self.alpha))
+        return torch.sum(upper * self.alpha + lower) / 128
