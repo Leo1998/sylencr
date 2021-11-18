@@ -7,7 +7,7 @@ from torch.utils.data import RandomSampler, SubsetRandomSampler
 
 import utils
 
-class Dataset(torch.utils.data.Dataset):
+class FullDataset(torch.utils.data.Dataset):
     def __init__(self, noise_path, speech_path):
         self.n_fft = 512
         self.n_mels = 128
@@ -47,7 +47,6 @@ class Dataset(torch.utils.data.Dataset):
         D_speech = utils.to_stft(speech_file, self.n_fft, self.sr)
         #print(f"D_speech.shape: {D_speech.shape}")
         
-        D_noise_orig = D_noise
         while D_noise.shape[0] < D_speech.shape[0]:
             D_noise = np.append(D_noise, D_noise, axis = 0)
         D_noise = D_noise[:D_speech.shape[0],:]

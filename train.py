@@ -39,9 +39,9 @@ def test_loop(dataloader, model, loss_fn):
     print(f"Test Error: Avg loss: {test_loss:>8f} \n")
 
 if __name__ == '__main__':
-    trainDataset = dataset.Dataset('data/train/noise', 'data/train/speech')
+    trainDataset = dataset.FullDataset('data/train/noise', 'data/train/speech')
     print(f"Length of trainDataset: {len(trainDataset)}")
-    testDataset = dataset.Dataset('data/test/noise', 'data/test/speech')
+    testDataset = dataset.FullDataset('data/test/noise', 'data/test/speech')
     print(f"Length of testDataset: {len(testDataset)}")
 
     windowedTrainDataset = dataset.WindowedDataset(trainDataset, 8)
@@ -51,8 +51,9 @@ if __name__ == '__main__':
     learning_rate = 1e-3
     epochs = 1
 
-    train_dataloader = DataLoader(windowedTrainDataset, num_workers=4, batch_size=batch_size)
-    test_dataloader = DataLoader(windowedTestDataset, num_workers=4, batch_size=batch_size)
+    num_workers = 4
+    train_dataloader = DataLoader(windowedTrainDataset, num_workers=num_workers, pin_memory=True, batch_size=batch_size)
+    test_dataloader = DataLoader(windowedTestDataset, num_workers=num_workers, pin_memory=True, batch_size=batch_size)
 
     device = 'cpu'
     #device = 'cuda' if torch.cuda.is_available() else 'cpu'
