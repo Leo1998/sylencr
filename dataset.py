@@ -10,6 +10,7 @@ import utils
 
 
 
+# original dataset from thesis
 class OriginalDataset(torch.utils.data.Dataset):
     def __init__(self, noise_path, speech_path):
         self.n_fft = 512
@@ -153,7 +154,7 @@ class WindowedDataset(torch.utils.data.IterableDataset):
         else:
             startIdx = int(len(self.trainDataset) / worker_info.num_workers) * worker_info.id
             endIdx = int(len(self.trainDataset) / worker_info.num_workers) * (worker_info.id + 1)
-            sampler = SubsetRandomSampler(range(0, len(self.trainDataset)))
+            sampler = SubsetRandomSampler(range(startIdx, endIdx))
 
             print(f"Initialized worker {worker_info.id} partition: ({startIdx}, {endIdx})")
         

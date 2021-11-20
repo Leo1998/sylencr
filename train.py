@@ -10,7 +10,7 @@ import losses
 import models
 
 def train_loop(dataloader, device, model, loss_fn, optimizer):
-    batch_counter = 0
+    num_batches = 0
     for X, X_norm, y, mask in dataloader:
         X, X_norm, y, mask = X.to(device), X_norm.to(device), y.to(device), mask.to(device)
 
@@ -24,10 +24,10 @@ def train_loop(dataloader, device, model, loss_fn, optimizer):
         optimizer.step()
 
         loss = loss.item()
-        print(f"batch: {batch_counter}, loss: {loss:>7f}")
-        batch_counter += 1
+        print(f"batch: {num_batches}, loss: {loss:>7f}")
+        num_batches += 1
 
-def test_loop(dataloader, model, loss_fn):
+def test_loop(dataloader, device, model, loss_fn):
     test_loss = 0
     num_batches = 0
     with torch.no_grad():
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     for t in range(epochs):
         print(f"Epoch {t+1}\n-------------------------------")
         train_loop(train_dataloader, device, model, loss_fn, optimizer)
-        test_loop(test_dataloader, device, model, loss_fn, optimizer)
+        test_loop(test_dataloader, device, model, loss_fn)
     print("Done!")
 
     torch.save(model.state_dict(), 'model_weights.pth')
