@@ -64,7 +64,7 @@ if __name__ == '__main__':
     model = models.DnnModel().to(device)
     print(model)
 
-    loss_fn = losses.CustomMaskMSE(alpha=8.0)
+    loss_fn = losses.CustomMaskMSE(batch_size=batch_size, alpha=8.0)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     for t in range(epochs):
